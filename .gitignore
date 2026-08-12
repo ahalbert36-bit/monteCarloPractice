@@ -1,3 +1,6 @@
-venv/
-venv/
+# macOS system files
 .DS_Store
+
+# Python virtual environments
+venv/
+.venv/
