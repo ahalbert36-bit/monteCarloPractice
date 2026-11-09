@@ -12,6 +12,7 @@ from numpy.random import default_rng
 import random
 rng = default_rng()
 from dateutil.relativedelta import relativedelta  # pip install python-dateutil
+from scipy.optimize import minimize
 
 
 #print(yf.download('AAPL', start='2025-01-01', end='2025-1-31', interval='1h')) #test to see if yfinance is working, prints AAPL stock data from Jan 1, 2023 to Dec 31, 2023
@@ -39,8 +40,11 @@ start_date = end_date - dt.timedelta(days=300) #end data minus 300 days (delta =
 
 mean_returns, cov_matrix, returns = get_data(stocks, start_date, end_date) #runs function and assigns outputs these variables
 
+'''
+random portfolio weights
 weights = np.random.random(len(mean_returns)) #length = number of stocks (number of mean return values), generates random float numbers btw 0 and 1 for each stock
 weights /= np.sum(weights) #divides weight by sum of weights to normalize them (so they add up to 1), 1*4
+'''
 
 weights=[.25, .25, .25, .25] #equal weights for each stock
 
@@ -191,6 +195,113 @@ CondVaR = results_df.apply(lambda col: initial_portfolio - mcConditionalValueRis
 
 risk_summary = pd.DataFrame({'VaR': VaR, 'CVaR': CondVaR})
 
-print(risk_summary)
+#print(risk_summary)
 
 #Conditional Value at Risk (CVaR) =  expected loss given that the loss has exceeded the Value at Risk (VaR) threshold (bottom 5%)
+
+'''
+Results:
+               VaR        CVaR
+normal  106.777628  144.990687
+t       112.228602  156.118029
+hist    106.598220  143.148523
+'''
+
+#Historic returns
+
+# Download approximately 5 years of daily adjusted prices
+end_date_past_data = pd.Timestamp.today().normalize() #today's date
+start_date_past_data = end_date_past_data - pd.DateOffset(years=5) #5 years before todays date
+
+prices_past_data = yf.download( #stock price for each company on each day
+    stocks,
+    start=start_date_past_data,
+    end=end_date_past_data,
+    auto_adjust=True,
+    progress=False
+)['Close'] #closing prices only
+
+
+returns_past_data = prices_past_data.pct_change().dropna()# Calculate daily returns
+portfolio_returns_past_data = returns_past_data @ weights #stock returns * weights for each day 
+#print("Number of daily observations:", len(portfolio_returns_past_data )) #number of days in window (each row is 1 day)
+
+
+#Predicting var forecasts
+
+# Backtesting settings
+window_backtest = 250 #about 1 year
+alpha_backtest = 0.05
+num_sims_backtest = 10000
+df_backtest = 8  # Degrees of freedom for Student-t model
+rng = np.random.default_rng(10)  # Random number generator for reproducibility
+
+
+# df and actual returns
+backtest_data = pd.DataFrame(index=portfolio_returns_past_data.index[window_backtest:],columns=['Normal', 'Student-t', 'Historical'],dtype=float) #empty df where each row is a day of last (5 yrs - 250 days) only for active trading days
+backtest_data['Actual Return'] = portfolio_returns_past_data.iloc[window_backtest:].to_numpy() #adds returns from portfolio_returns_past_data as an extra column
+
+'''
+# Roll forward through the data one trading day at a time
+for i in range(window_backtest, len(returns)):
+
+    # Only use data available before day i
+    historical_window = returns.iloc[i-window_backtest:i]
+
+    # Estimate parameters from the rolling window
+    mu = historical_window.mean().to_numpy()
+    cov = historical_window.cov().to_numpy()
+
+    # Portfolio returns for the historical window
+    historical_portfolio = historical_window @ weights
+
+    # Cholesky decomposition for correlated stock returns
+    L = np.linalg.cholesky(cov)
+
+    # -----------------------------------------
+    # Model 1: Multivariate Normal
+    # -----------------------------------------
+    z_normal = rng.standard_normal(
+        size=(mc_sims, len(stocks))
+    )
+
+    simulated_normal = mu + z_normal @ L.T
+
+    portfolio_normal = simulated_normal @ weights
+
+    backtest.iloc[i-window, 0] = np.quantile(
+        portfolio_normal, alpha
+    )
+
+    # -----------------------------------------
+    # Model 2: Multivariate Student-t
+    # -----------------------------------------
+    L_t = np.linalg.cholesky(
+        cov * (df - 2) / df
+    )
+
+    z_t = rng.standard_normal(
+        size=(mc_sims, len(stocks))
+    ) @ L_t.T
+
+    u = rng.chisquare(df, size=mc_sims)
+
+    simulated_t = mu + z_t / np.sqrt(u / df)[:, None]
+
+    portfolio_t = simulated_t @ weights
+
+    backtest.iloc[i-window, 1] = np.quantile(
+        portfolio_t, alpha
+    )
+
+    # -----------------------------------------
+    # Model 3: Historical Simulation
+    # -----------------------------------------
+    backtest.iloc[i-window, 2] = np.quantile(
+        historical_portfolio, alpha
+    )
+
+# Display initial forecasts
+print(backtest.head())
+
+'''
