@@ -26,8 +26,8 @@ def get_data(stocks, start, end, trade_days=200):
 
 def get_historical_portfolio_returns(stocks, weights, years_back=5):
     """Download historical price data and compute portfolio returns."""
-    end_date = pd.Timestamp.today().normalize() #today's date
-    start_date = end_date - pd.DateOffset(years=years_back) #date 5 years ago
+    end_date = pd.Timestamp("2026-09-30").normalize() #fixed end date 9/30/2026
+    start_date = end_date - pd.DateOffset(years=years_back) #date 5 years before the fixed end date
 
     prices = yf.download(stocks,start=start_date,end=end_date,auto_adjust=True,)['Close'] #closing prices for each stock on each day in 5-year span
 
@@ -38,6 +38,6 @@ def get_historical_portfolio_returns(stocks, weights, years_back=5):
 
 def build_window_dates(days_back=300):
     """Return a start and end date for recent market data."""
-    end_date = dt.datetime.now()
+    end_date = dt.datetime(2026, 9, 30) #9/30/2026
     start_date = end_date - dt.timedelta(days=days_back)
     return start_date, end_date
