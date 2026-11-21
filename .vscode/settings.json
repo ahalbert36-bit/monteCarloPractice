@@ -1,0 +1,7 @@
+{
+  "jupyter.notebookFileRoot": "${workspaceFolder}/MQF_Portfolio_Risk/notebook-files",
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/MQF_Portfolio_Risk/notebook-files"
+  ],
+  "python.envFile": "${workspaceFolder}/.env"
+}

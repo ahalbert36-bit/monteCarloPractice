@@ -8,7 +8,7 @@ def get_data(stocks, start, end, trade_days=200):
     """Download stock data, compute daily returns, and summarize risk."""
     stock_data = yf.download(stocks, start=start, end=end, auto_adjust=False) #download stock data from Yahoo Finance
 
-    if isinstance(stock_data.columns, pd.MultiIndex): #if stock data has multiple colummns
+    if isinstance(stock_data.columns, pd.MultiIndex): #if stock data has multiple columns
         stock_data = stock_data['Close'] #select column labeled 'Close'
     else: #if stock data has 1 column
         if 'Close' in stock_data.columns: #if the 1 column is labeled 'Close'
@@ -21,7 +21,7 @@ def get_data(stocks, start, end, trade_days=200):
     returns = stock_data.pct_change().tail(trade_days) #compute percentage change in closing value for each day in 200-day span
     mean_returns = returns.mean() #mean of daily returns for the stock
     cov_matrix = returns.cov() #covariance matrix of daily returns for the stock
-    return mean_returns, cov_matrix, returns
+    return mean_returns, cov_matrix
 
 
 def get_historical_portfolio_returns(stocks, weights, years_back=5):

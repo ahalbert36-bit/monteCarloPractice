@@ -39,12 +39,12 @@ def simulate_student_t_model(mean_m, cov_matrix, weights, initial_portfolio, num
     return portfolio_sims_t
 
 
-def simulate_random_day_model(returns, weights, initial_portfolio, num_days, mc_sims):
+def simulate_random_day_model(historical_stock_returns, weights, initial_portfolio, num_days, mc_sims):
     """Sample historical return days with replacement to build a distribution."""
     portfolio_hist = np.full(shape=(num_days, mc_sims), fill_value=0.0)
 
     for m in range(mc_sims):
-        sampled_returns = returns.sample(n=num_days, replace=True) #randomly select certain days from historical returns and use their real returns as the returns for each stock
+        sampled_returns = historical_stock_returns.sample(n=num_days, replace=True) #randomly select certain days from historical returns and use their real returns as the returns for each stock
         portfolio_hist[:, m] = np.cumprod(sampled_returns @ weights + 1) * initial_portfolio #randomly selected returns for each stock put together to completely simulate stock returns for each day
 
     return portfolio_hist
