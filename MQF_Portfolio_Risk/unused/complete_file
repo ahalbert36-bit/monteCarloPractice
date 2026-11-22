@@ -26,7 +26,7 @@ start_date = end_date - dt.timedelta(days=300)
 
 initial_portfolio = 1000
 mc_sims = 500
-num_days = 50
+num_days = 250
 alpha = 5
 
 rng = default_rng()

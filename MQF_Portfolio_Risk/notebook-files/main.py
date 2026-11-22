@@ -16,7 +16,7 @@ def main():
     weights = [0.25, 0.25, 0.25, 0.25]
     initial_portfolio = 1000 #starting amount of money
     mc_sims = 500 #number of simulations
-    num_days = 50 #number of days being measured
+    num_days = 250 #number of days being measured
     alpha = 5 #bottom 5% being evaluated for risk
 
     start_date, end_date = build_window_dates(days_back=300)
