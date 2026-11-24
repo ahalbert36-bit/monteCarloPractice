@@ -30,7 +30,7 @@ def main():
     )
 
     normal_sims = simulate_normal_model(mean_m, cov_matrix, weights, initial_portfolio, num_days, mc_sims) #simulates full portfolio returns for each day
-    t_sims = simulate_student_t_model(mean_m, cov_matrix, weights, initial_portfolio, num_days, mc_sims, df=8)
+    t_sims = simulate_student_t_model(mean_m, cov_matrix, weights, initial_portfolio, num_days, mc_sims, df=5)
     hist_sims = simulate_random_day_model(historical_stock_returns, weights, initial_portfolio, num_days, mc_sims)
 
     results_df = pd.DataFrame({ #creates dataframe with the final portfolio value for each simulation for each model
@@ -50,7 +50,7 @@ def main():
         window_backtest=250, #number of days to use for historical data to calculate VaR
         alpha_backtest=5,
         num_sims_backtest=10000,
-        df_backtest=8, #same df as used in the Student-t model
+        df_backtest=5, #same df as used in the Student-t model
     )
 
     print('\nVaR Backtest Summary')

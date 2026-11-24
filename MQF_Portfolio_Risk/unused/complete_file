@@ -76,7 +76,7 @@ for m in range(mc_sims):
 # Model 2: Student-t distribution
 # ----------------------------
 portfolio_sims_t = np.full(shape=(num_days, mc_sims), fill_value=0.0)
-df = 8
+df = 5
 
 for m in range(mc_sims):
     z = np.random.normal(size=(num_days, len(mean_returns)))
@@ -160,7 +160,7 @@ portfolio_returns_past_data = returns_past_data @ weights
 window_backtest = 250
 alpha_backtest = 0.05
 num_sims_backtest = 10000
-df_backtest = 8
+df_backtest = 5
 rng = np.random.default_rng(10)
 
 backtest_data = pd.DataFrame(

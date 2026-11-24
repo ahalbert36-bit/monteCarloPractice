@@ -21,7 +21,7 @@ def simulate_normal_model(mean_m, cov_matrix, weights, initial_portfolio, num_da
     return portfolio_sims
 
 
-def simulate_student_t_model(mean_m, cov_matrix, weights, initial_portfolio, num_days, mc_sims, df=8, rng=None):
+def simulate_student_t_model(mean_m, cov_matrix, weights, initial_portfolio, num_days, mc_sims, df=5, rng=None):
     """Run Monte Carlo simulation using a multivariate Student-t distribution."""
     if rng is None: #if no random number generator is provided
         rng = np.random.default_rng() #create default random number generator

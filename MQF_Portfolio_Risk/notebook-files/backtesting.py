@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def run_var_backtest(stock_returns, portfolio_returns, weights, window_backtest=250, alpha_backtest=5, num_sims_backtest=10000, df_backtest=8, rng=None):
+def run_var_backtest(stock_returns, portfolio_returns, weights, window_backtest=250, alpha_backtest=5, num_sims_backtest=10000, df_backtest=5, rng=None):
     """Backtest VaR models against realized portfolio returns."""
     if rng is None:  # if no rng is provided
         rng = np.random.default_rng(10)  # create new rng
