@@ -6,7 +6,7 @@ import yfinance as yf
 
 def get_data(stocks, start, end, trade_days=200):
     """Download stock data, compute daily returns, and summarize risk."""
-    stock_data = yf.download(stocks, start=start, end=end, auto_adjust=False) #download stock data from Yahoo Finance
+    stock_data = yf.download(stocks, start=start, end=end, auto_adjust=True) #download stock data from Yahoo Finance
 
     if isinstance(stock_data.columns, pd.MultiIndex): #if stock data has multiple columns
         stock_data = stock_data['Close'] #select column labeled 'Close'

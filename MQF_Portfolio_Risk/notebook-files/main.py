@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 from data import build_window_dates, get_data, get_historical_portfolio_returns
 from simulation import (
@@ -29,9 +30,13 @@ def main():
         years_back=5,
     )
 
-    normal_sims = simulate_normal_model(mean_m, cov_matrix, weights, initial_portfolio, num_days, mc_sims) #simulates full portfolio returns for each day
-    t_sims = simulate_student_t_model(mean_m, cov_matrix, weights, initial_portfolio, num_days, mc_sims, df=5)
-    hist_sims = simulate_random_day_model(historical_stock_returns, weights, initial_portfolio, num_days, mc_sims)
+    # Define the random number generator before the first use (Normal model)
+    # so both the Normal and Student-t models share the same rng.
+    rng = np.random.default_rng()
+
+    normal_sims = simulate_normal_model(mean_m, cov_matrix, weights, initial_portfolio, num_days, mc_sims, rng=rng) #simulates full portfolio returns for each day
+    t_sims = simulate_student_t_model(mean_m, cov_matrix, weights, initial_portfolio, num_days, mc_sims, df=5, rng=rng)
+    hist_sims = simulate_random_day_model(historical_stock_returns, weights, initial_portfolio, num_days, mc_sims, rng=rng)
 
     results_df = pd.DataFrame({ #creates dataframe with the final portfolio value for each simulation for each model
         'normal': normal_sims[-1, :],
