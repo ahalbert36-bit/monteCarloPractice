@@ -1,15 +1,15 @@
 import pandas as pd
 import numpy as np
 
-from data import build_window_dates, get_data, get_historical_portfolio_returns
-from simulation import (
+from MQF_Portfolio_Risk.data import build_window_dates, get_data, get_historical_portfolio_returns
+from MQF_Portfolio_Risk.simulation import (
     build_mean_matrix,
     simulate_normal_model,
     simulate_random_day_model,
     simulate_student_t_model,
 )
-from risk import summarize_risk
-from backtesting import run_var_backtest
+from MQF_Portfolio_Risk.risk import summarize_risk
+from MQF_Portfolio_Risk.backtesting import run_var_backtest
 
 
 def main():
