@@ -12,16 +12,17 @@ from MQF_Portfolio_Risk.risk import summarize_risk
 from MQF_Portfolio_Risk.backtesting import run_var_backtest
 
 
-def main():
-    stocks = ['AAPL', 'MSFT', 'GOOG', 'AMZN']
-    weights = [0.25, 0.25, 0.25, 0.25]
-    initial_portfolio = 1000 #starting amount of money
-    mc_sims = 500 #number of simulations
-    num_days = 250 #number of days being measured
-    alpha = 5 #bottom 5% being evaluated for risk
+stocks = ['CSCO', 'CMCSA', 'PFE', 'AMT']
+weights = [0.25, 0.25, 0.25, 0.25]
+initial_portfolio = 1000 #starting amount of money
+num_days = 250 #number of days being measured
+mc_sims = 10000 #number of simulations
+alpha = 5 #5% alpha
 
-    start_date, end_date = build_window_dates(days_back=300)
-    mean_returns, cov_matrix = get_data(stocks, start_date, end_date) #uses 200 recent trading days for normal and Student-t parameter estimates
+
+def main():
+    start_date, end_date = build_window_dates(days_back=365)
+    mean_returns, cov_matrix,_ = get_data(stocks, start_date, end_date) #uses 250 recent trading days for normal and Student-t parameter estimates
     mean_m = build_mean_matrix(mean_returns, num_days) #mean_returns column vector repeated num_days times
 
     historical_stock_returns, portfolio_returns_past_data = get_historical_portfolio_returns(
@@ -49,8 +50,8 @@ def main():
     print(risk_summary)
 
     backtest_data, summary = run_var_backtest(
-        historical_stock_returns,
-        portfolio_returns_past_data,
+        historical_stock_returns, #returns of each stock each day in 5-year window
+        portfolio_returns_past_data, #returns of portfolio as a whole each day in 5-year window
         weights,
         window_backtest=250, #number of days to use for historical data to calculate VaR
         alpha_backtest=5,

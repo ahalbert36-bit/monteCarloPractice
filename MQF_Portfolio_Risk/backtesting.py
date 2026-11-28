@@ -3,7 +3,6 @@ import pandas as pd
 
 
 def run_var_backtest(stock_returns, portfolio_returns, weights, window_backtest=250, alpha_backtest=5, num_sims_backtest=10000, df_backtest=5, rng=None):
-    """Backtest VaR models against realized portfolio returns."""
     if rng is None:  # if no rng is provided
         rng = np.random.default_rng(10)  # create new rng
 
@@ -28,16 +27,16 @@ def run_var_backtest(stock_returns, portfolio_returns, weights, window_backtest=
         L = np.linalg.cholesky(cov)  # Cholesky decomposition of the covariance matrix
         simulated_normal = mu + z_normal @ L.T  # simulate daily returns for each stock
         portfolio_normal = simulated_normal @ weights  # generates full portfolio returns for each day
-        backtest_data.iloc[i - window_backtest, 0] = np.percentile(portfolio_normal, alpha_backtest)  # calculates VaR (bottom alpha returns) out of the simulated portfolio end returns
+        backtest_data.iloc[i - window_backtest, 0] = np.percentile(portfolio_normal, alpha_backtest)  # calculates VaR (bottom alpha percentile) out of the simulated portfolio end returns
 
         #t backtest
-        z_t = rng.standard_normal(size=(num_sims_backtest, len(stocks)))  # standard normal random vars for each stock and simulation
-        L_t = np.linalg.cholesky(cov * (df_backtest - 2) / df_backtest)  # cholesky decomposition scaled by (df-2)/df
+        z_t = rng.standard_normal(size=(num_sims_backtest, len(stocks)))  # standard normal random variables for each stock for each simulation
         u_t = rng.chisquare(df_backtest, size=num_sims_backtest)  # chi-square random variables for each simulation
-        x_t = z_t / np.sqrt(u_t / df_backtest)[:, None]  # z-term adjusted for the Student-t covariance
-        simulated_t = mu + x_t @ L_t.T  # simulate daily returns for each stock under the Student-t distribution
+        L_t = np.linalg.cholesky(cov * (df_backtest - 2) / df_backtest)  # cholesky decomposition scaled by (df-2)/df to account for the Student-t distribution's heavier tails
+        x_t = z_t / np.sqrt(u_t / df_backtest)[:, None]  # z-term adjusted so the covariance is the same as the multivariate normal distribution
+        simulated_t = mu + x_t @ L_t.T
         portfolio_t = simulated_t @ weights  # full-portfolio returns for each day
-        backtest_data.iloc[i - window_backtest, 1] = np.percentile(portfolio_t, alpha_backtest)  # VaR for t-test
+        backtest_data.iloc[i - window_backtest, 1] = np.percentile(portfolio_t, alpha_backtest)  # VaR of t-test
 
         #historical backtest
         historical_portfolio = historical_window @ weights  # full portfolio returns for each day
